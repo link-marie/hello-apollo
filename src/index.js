@@ -18,6 +18,14 @@ const client = new ApolloClient({
         }`
       }
     });
+  },
+  onError: ({ graphQLErrors, networkError }) => {
+    if (graphQLErrors) {
+      // graphQLErrors固有の処理
+    }
+    if (networkError) {
+      // networkError固有の処理
+    }
   }
 });
 

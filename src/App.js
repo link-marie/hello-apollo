@@ -1,26 +1,90 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { Query, Mutation } from 'react-apollo';
+import gql from 'graphql-tag';
 import logo from './logo.svg';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const query = gql`
+  {
+    organization(login: "apollographql") {
+      repositories(first: 5, isFork: false) {
+        nodes {
+          id
+          name
+          url
+          viewerHasStarred
+          stargazers {
+            totalCount
+          }
+        }
+      }
+    }
+  }
+`;
+
+const ADD_STAR_REPOSITORY = gql`
+  mutation($id: ID!) {
+    addStar(input: { starrableId: $id }) {
+      starrable {
+        id
+        viewerHasStarred
+      }
+    }
+  }
+`;
+
+const REMOVE_STAR_REPOSITORY = gql`
+  mutation($id: ID!) {
+    removeStar(input: { starrableId: $id }) {
+      starrable {
+        id
+        viewerHasStarred
+      }
+    }
+  }
+`;
+
+const App = () => (
+  <Query query={query}>
+    {({ loading, error, data }) => {
+      if (loading) return <p>Loading...</p>;
+      if (error) return <p>{error.toString()}</p>;
+
+      const repositories = data.organization.repositories.nodes;
+
+      return (
+        <ul>
+          {repositories.map(repo => (
+            <li key={repo.id}>
+              <a href={repo.url}>{repo.name}</a>
+              <button>{repo.stargazers.totalCount} Star</button>
+
+              {/* 既にstarしてあるかどうかで出し分け */}
+              {!repo.viewerHasStarred ? (
+                <Mutation
+                  mutation={ADD_STAR_REPOSITORY}
+                  variables={{ id: repo.id }}
+                >
+                  {(addStar, { data, loading, error }) => (
+                    <button onClick={addStar}>star</button>
+                  )}
+                </Mutation>
+              ) : (
+                <Mutation
+                  mutation={REMOVE_STAR_REPOSITORY}
+                  variables={{ id: repo.id }}
+                >
+                  {(removeStar, { data, loading, error }) => (
+                    <button onClick={removeStar}>unstar</button>
+                  )}
+                </Mutation>
+              )}
+            </li>
+          ))}
+        </ul>
+      );
+    }}
+  </Query>
+);
 
 export default App;

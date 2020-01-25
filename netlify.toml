@@ -5,3 +5,4 @@
 [context.production.environment]
   TOML_ENV_VAR = "From netlify.toml"
   REACT_APP_TOML_ENV_VAR = "From netlify.toml (REACT_APP_)"
+  REACT_APP_GITHUB_PERSONAL_ACCESS_TOKEN=f81f348d199916edc389b8ae46529a71e89a1dd5

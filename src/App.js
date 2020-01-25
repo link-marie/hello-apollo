@@ -45,6 +45,7 @@ const REMOVE_STAR_REPOSITORY = gql`
 `;
 
 const App = () => (
+  
   <Query query={query}>
     {({ loading, error, data }) => {
       if (loading) return <p>Loading...</p>;
@@ -53,8 +54,13 @@ const App = () => (
       const repositories = data.organization.repositories.nodes;
 
       return (
+      <div>
+        <div className="env">
+          <p>REACT_APP_CUSTOM_ENV_VAR value is "{process.env.REACT_APP_CUSTOM_ENV_VAR}"</p>
+        </div>
         <ul>
           {repositories.map(repo => (
+
             <li key={repo.id}>
               <a href={repo.url}>{repo.name}</a>
               <button>{repo.stargazers.totalCount} Star</button>
@@ -82,6 +88,7 @@ const App = () => (
             </li>
           ))}
         </ul>
+        </div>
       );
     }}
   </Query>
